@@ -1,0 +1,16 @@
+{
+    "channels":[
+        "961046719712342027"
+    ],
+
+    "cooldown": {
+        "default" : 60,
+        "hello" : 1,
+        "scan" : 0.1,
+
+        "delete" : {
+            "hello" : 60,
+            "scan": 0
+        }
+    }
+}

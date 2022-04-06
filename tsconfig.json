@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target" : "ESNext",
+        "module" : "commonjs",
+        "skipLibCheck" : true,
+        "resolveJsonModule": true,
+        "watch": true,
+        "moduleResolution": "node",
+        "lib": [
+            "es6",
+        ], 
+    },
+    "exclude": [
+        "node_modules",
+    ],
+}
