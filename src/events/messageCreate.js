@@ -3,9 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const commands_1 = require("../handlers/commands");
 const publ = require("../configs/public.json");
-exports.default = async (client, message, localDB, cooldowns) => {
+exports.default = async (client, message, cooldowns) => {
     if (message.author.bot)
         return;
+    if ((message.channel instanceof discord_js_1.NewsChannel
+        || message.channel instanceof discord_js_1.DMChannel)
+        || !publ.channels.includes(message.channel.id)) {
+        message.channel.send('Please use a valid channel')
+            .then(msg => { setTimeout(() => msg.delete().catch(() => { return; }), 4 * 1000); });
+        return;
+    }
+    let channel = message.channel;
     let commandName, args;
     commandName = message.content.substr(1).split(" ")[0].toLowerCase();
     args = message.content.split(" ").slice(1);
@@ -31,7 +39,7 @@ exports.default = async (client, message, localDB, cooldowns) => {
     setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
     try {
         if (command.guildOnly && message.channel instanceof discord_js_1.DMChannel) {
-            message.channel.send('This command cannot be used inside DMs')
+            channel.send('This command cannot be used inside DMs')
                 .then(msg => { setTimeout(() => msg.delete().catch(() => { return; }), 4 * 1000); });
             return;
         }
@@ -48,15 +56,7 @@ exports.default = async (client, message, localDB, cooldowns) => {
                 .then(msg => { setTimeout(() => msg.delete().catch(() => { return; }), 4 * 1000); });
             return;
         }
-        if (!(message.channel instanceof discord_js_1.TextChannel
-            || message.channel instanceof discord_js_1.ThreadChannel
-            || message.channel instanceof discord_js_1.GuildChannel)
-            || !publ.channels.includes(message.channel.id)) {
-            message.channel.send('Please use a valid channel')
-                .then(msg => { setTimeout(() => msg.delete().catch(() => { return; }), 4 * 1000); });
-            return;
-        }
-        command.execute(message, args.filter(n => { return n !== ''; }), client, localDB);
+        command.execute(message, args.filter(n => { return n !== ''; }), client);
     }
     catch (err) {
         console.log(err);

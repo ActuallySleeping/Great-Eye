@@ -8,8 +8,8 @@ const getCommands = async  () => {
 
 	let commands : command[] = [];
 
-	const _hello = await import('../commands/hello')
-	commands.push(new _hello.hello)
+	const _add = await import('../commands/add')
+	commands.push(new _add.add)
     
     const _scan = await import('../commands/scan')
 	commands.push(new _scan.scan)

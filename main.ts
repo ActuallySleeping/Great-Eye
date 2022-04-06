@@ -2,34 +2,10 @@ import * as fs from 'fs';
 
 import { Client, Collection, Intents } from 'discord.js';
 
-import * as sqlite from 'sqlite3';
-let sqlite3 = sqlite.verbose();
+import { PrismaClient } from '@prisma/client'
 
 import * as publ from './src/configs/public.json';
 import * as priv from './src/configs/private.json';
-
-let localDB : sqlite.Database;
-const localDB_location = `${__dirname}/src/base.sqlite3`;
-
-/*
-We need to check if the database file exists, if it does not, it will automatically create a new database.
-This database will have all the tables set up to use the bot.
-*/
-if( fs.existsSync(localDB_location) ){
-	localDB = new sqlite3.Database(localDB_location);
-} else {
-	localDB = new sqlite3.Database(localDB_location);
-	localDB.run('CREATE TABLE PLAYERS ('+
-		'id			    TEXT,'+
-		'player_id	 	TEXT,'+
-		'server_id		TEXT,'+
-        'start  		TEXT,'+
-        'stop   		TEXT,'+
-        'name   		TEXT,'+
-        'firstTime		TEXT,'+
-		'PRIMARY KEY(id)'+
-		')');
-}
 
 const client = new Client({
 	intents : [
@@ -45,7 +21,7 @@ const client = new Client({
 
         const h = await import(handlerPath);
 
-        h.default(client, localDB);
+        h.default();
 	});
 
 	/* Event Handler */
@@ -64,7 +40,7 @@ const client = new Client({
 
         const events = await import(eventsPath);
         
-        events.default(client, message, localDB, cooldowns);
+        events.default(client, message, cooldowns);
 	});
 
 	/*client.on('interactionCreate', async (interaction) => {

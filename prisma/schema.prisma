@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  id          String @id @unique
+  player_id   String?
+  name        String? 
+  last_server String @default("")
+  status      Int @default(0)
+  comment     String?
+  tribe       Tribe? @relation(fields: [id], references: [name])
+}
+
+model Server {
+  id          String @id @unique
+  name        String?
+  status      Int @default(0)
+  tribe       String?
+  comment     String?
+}
+
+model Guild {
+  guild_id    String @id @unique
+  channels    Channel[]
+  Messages    Message[]
+}
+
+model Channel {
+  channel_id  String @id @unique
+  guild       Guild @relation(fields: [channel_id], references: [guild_id])
+}
+
+model Message {
+  message_id  String @id @unique
+  guild       Guild @relation(fields: [message_id], references: [guild_id])
+}
+
+model Tribe {
+  name        String @id
+  Players     Player[] 
+}

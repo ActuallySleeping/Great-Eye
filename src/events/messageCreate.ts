@@ -1,11 +1,24 @@
-import { Collection, Client, Message, TextChannel, DMChannel, GuildChannel, ThreadChannel, Guild } from "discord.js";
+import { Collection, Client, Message, TextChannel, DMChannel, GuildChannel, ThreadChannel, NewsChannel, PartialDMChannel, PartialGroupDMChannel } from "discord.js";
 import { Database } from "sqlite3";
 import getCommands from "../handlers/commands";
 
 import * as publ from '../configs/public.json';
 
-export default async (client : Client, message : Message<boolean>, localDB : Database, cooldowns : Collection<String, Collection<String, number>>) => {
+export default async (client : Client, message : Message<boolean>, cooldowns : Collection<String, Collection<String, number>>) => {
 		if ( message.author.bot ) return;
+
+		if( (message.channel instanceof NewsChannel
+			||   message.channel instanceof DMChannel  )
+			
+			|| !publ.channels.includes(message.channel.id)
+
+		){
+			message.channel.send('Please use a valid channel')
+			  .then(msg=>{setTimeout(() => msg.delete().catch(() => {return}), 4 * 1000)})
+			return 
+		}
+
+		let channel = message.channel;
 
 		let commandName: string, args: string[];
 
@@ -38,7 +51,7 @@ export default async (client : Client, message : Message<boolean>, localDB : Dat
 
 		try {
 			if(command.guildOnly && message.channel instanceof DMChannel){
-				message.channel.send('This command cannot be used inside DMs')
+				channel.send('This command cannot be used inside DMs')
 				  .then(msg=>{setTimeout(() => msg.delete().catch(() => {return}), 4 * 1000)})
 				return
 			}
@@ -57,21 +70,8 @@ export default async (client : Client, message : Message<boolean>, localDB : Dat
 				  .then(msg=>{setTimeout(() => msg.delete().catch(() => {return}), 4 * 1000)})
 				return 
 			}
-           
-			
-			if( !( message.channel instanceof TextChannel
-				||   message.channel instanceof ThreadChannel
-				||   message.channel instanceof GuildChannel )
-				
-				|| !publ.channels.includes(message.channel.id)
 
-			){
-				message.channel.send('Please use a valid channel')
-				  .then(msg=>{setTimeout(() => msg.delete().catch(() => {return}), 4 * 1000)})
-				return 
-			}
-
-			command.execute(message, args.filter(n=>{return n!==''}), client, localDB);
+			command.execute(message, args.filter(n=>{return n!==''}), client);
 		} catch (err) {
 			console.log(err);
 		}
