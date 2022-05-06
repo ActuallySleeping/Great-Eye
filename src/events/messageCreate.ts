@@ -13,8 +13,6 @@ export default async (client : Client, message : Message<boolean>, cooldowns : C
 			|| !publ.channels.includes(message.channel.id)
 
 		){
-			message.channel.send('Please use a valid channel')
-			  .then(msg=>{setTimeout(() => msg.delete().catch(() => {return}), 4 * 1000)})
 			return 
 		}
 

@@ -9,8 +9,6 @@ exports.default = async (client, message, cooldowns) => {
     if ((message.channel instanceof discord_js_1.NewsChannel
         || message.channel instanceof discord_js_1.DMChannel)
         || !publ.channels.includes(message.channel.id)) {
-        message.channel.send('Please use a valid channel')
-            .then(msg => { setTimeout(() => msg.delete().catch(() => { return; }), 4 * 1000); });
         return;
     }
     let channel = message.channel;

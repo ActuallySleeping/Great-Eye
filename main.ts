@@ -7,6 +7,11 @@ import { PrismaClient } from '@prisma/client'
 import * as publ from './src/configs/public.json';
 import * as priv from './src/configs/private.json';
 
+import axios from 'axios';
+import * as cloudflare from "axios-cloudflare";
+
+cloudflare(axios);
+
 const client = new Client({
 	intents : [
 		Intents.FLAGS.GUILDS, 
@@ -15,23 +20,24 @@ const client = new Client({
 		],
 });
 
-	/* Handler of Handlers */
-	['commands'].forEach( async (handler) => {
-        const handlerPath = `./src/handlers/${handler}`;
-
-        const h = await import(handlerPath);
-
-        h.default();
-	});
-
 	/* Event Handler */
-	/*client.on('ready', async () => {
+	client.on('ready', async () => {
         const eventsPath = `./src/events/ready`;
 
         const events = await import(eventsPath);
 
-        events.default(client, localDB);
-	});*/
+        events.default(client);
+	
+		/* Handler of Handlers */
+		const handlers = fs.readdirSync('./src/handlers').filter(handler => handler.endsWith('.js'));
+		handlers.forEach( async (handler) => {
+			const handlerPath = `./src/handlers/${handler}`;
+
+			const h = await import(handlerPath);
+
+			h.default(client);
+		});
+	});
 
     let cooldowns : Collection<string, Collection<string, number>> = new Collection();
 
@@ -51,6 +57,6 @@ const client = new Client({
         events.default(client, localDB, interaction);
 	});*/
 
-client.login(priv.token);
+client.login(priv.tokens.discord);
 
 

@@ -1,7 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs = require("fs");
 const discord_js_1 = require("discord.js");
 const priv = require("./src/configs/private.json");
+const axios_1 = require("axios");
+const cloudflare = require("axios-cloudflare");
+cloudflare(axios_1.default);
 const client = new discord_js_1.Client({
     intents: [
         discord_js_1.Intents.FLAGS.GUILDS,
@@ -9,20 +13,19 @@ const client = new discord_js_1.Client({
         discord_js_1.Intents.FLAGS.GUILD_MESSAGE_REACTIONS
     ],
 });
-/* Handler of Handlers */
-['commands'].forEach(async (handler) => {
-    const handlerPath = `./src/handlers/${handler}`;
-    const h = await Promise.resolve().then(() => require(handlerPath));
-    h.default();
-});
 /* Event Handler */
-/*client.on('ready', async () => {
+client.on('ready', async () => {
     const eventsPath = `./src/events/ready`;
-
-    const events = await import(eventsPath);
-
-    events.default(client, localDB);
-});*/
+    const events = await Promise.resolve().then(() => require(eventsPath));
+    events.default(client);
+    /* Handler of Handlers */
+    const handlers = fs.readdirSync('./src/handlers').filter(handler => handler.endsWith('.js'));
+    handlers.forEach(async (handler) => {
+        const handlerPath = `./src/handlers/${handler}`;
+        const h = await Promise.resolve().then(() => require(handlerPath));
+        h.default(client);
+    });
+});
 let cooldowns = new discord_js_1.Collection();
 client.on('messageCreate', async (message) => {
     const eventsPath = `./src/events/messageCreate`;
@@ -36,4 +39,4 @@ client.on('messageCreate', async (message) => {
 
     events.default(client, localDB, interaction);
 });*/
-client.login(priv.token);
+client.login(priv.tokens.discord);

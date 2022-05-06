@@ -11,40 +11,42 @@ datasource db {
 }
 
 model Player {
-  id          String @id @unique
-  player_id   String?
-  name        String? 
-  last_server String @default("")
-  status      Int @default(0)
-  comment     String?
-  tribe       Tribe? @relation(fields: [id], references: [name])
+  id                  Int @id @default(autoincrement())
+  battlemetrics_id    String @unique
+  name                String? 
+  last_server         String?
+  status              Int?
+  comment             String?
+  tribe_name          String?  
+  tribe               Tribe? @relation(fields: [tribe_name], references: [name])
 }
 
 model Server {
   id          String @id @unique
   name        String?
-  status      Int @default(0)
+  status      Int? @default(0)
   tribe       String?
   comment     String?
 }
 
-model Guild {
-  guild_id    String @id @unique
-  channels    Channel[]
-  Messages    Message[]
+model Tribe {
+  name          String @id
+  players       Player[] 
+  alliance_name String?
+  alliance      Alliance? @relation(fields: [alliance_name], references: [name])
+  status        Int? @default(0)
 }
 
-model Channel {
-  channel_id  String @id @unique
-  guild       Guild @relation(fields: [channel_id], references: [guild_id])
+model Alliance {
+  name          String @id
+  tribe_name    String?
+  tribes        Tribe[]
 }
 
 model Message {
-  message_id  String @id @unique
-  guild       Guild @relation(fields: [message_id], references: [guild_id])
-}
-
-model Tribe {
-  name        String @id
-  Players     Player[] 
+  message_id  String
+  channel_id  String @id
+  guild_id    String 
+  author_id   String?
+  server_id   String?
 }
